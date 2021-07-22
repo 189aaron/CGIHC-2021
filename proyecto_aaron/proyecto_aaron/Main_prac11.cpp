@@ -200,7 +200,8 @@ int main()
 
 	Model cama((char *)"Models/cama/Single_Bed.obj");
 	Model fogata((char *)"Models/fogata/Campfire.obj");
-	Model casa((char *)"Models/villaf/villaF1.obj");
+	Model casa_aa((char *)"Models/villaf/villaF1.obj");
+	Model casa_aa_c((char *)"Models/villaf/villaF_cristales.obj");
 
 	
 	// Build and compile our shader program
@@ -590,7 +591,16 @@ int main()
 		model = glm::rotate(model, glm::radians(rotKit), glm::vec3(0.0f, 1.0f, 0.0));
 		//model = glm::scale(model, glm::vec3(0.02f, 0.02f, 0.02f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		casa.Draw(lightingShader);
+		casa_aa.Draw(lightingShader);
+
+
+		//casa cristales
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, PosIniAuto + glm::vec3(10, 0, 10));
+		model = glm::rotate(model, glm::radians(rotKit), glm::vec3(0.0f, 1.0f, 0.0));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		casa_aa_c.Draw(lightingShader);
 
 		//cama
 		view = camera.GetViewMatrix();
