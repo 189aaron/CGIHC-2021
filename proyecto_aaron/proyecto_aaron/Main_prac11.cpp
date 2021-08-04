@@ -36,22 +36,25 @@ const GLuint WIDTH = 1024, HEIGHT = 720;
 int SCREEN_WIDTH, SCREEN_HEIGHT;
 
 // Camera
-Camera  camera(glm::vec3(-63.0f, 3.0f, -15.0f));
+Camera  camera(glm::vec3(5.0f, 3.0f, 35.0f));
 GLfloat lastX = WIDTH / 2.0;
 GLfloat lastY = HEIGHT / 2.0;
 bool keys[1024];
 bool firstMouse = true;
 float range = 0.0f;
-float rot = 0.0f;
+float rot = 90.0f;
 
 
 // Light attributes
 glm::vec3 lightPos(0.0f, 0.0f, 0.0f);
-glm::vec3 PosIni(-95.0f, 1.0f, -45.0f);
-glm::vec3 PosIniAuto(-75.0f, 1.0f, -45.0f);
+glm::vec3 PosIni(-25.0f, 1.0f, -15.0f);
+glm::vec3 PosIniAuto(-15.0f, 0.0f, -15.0f);
+glm::vec3 casa_2(35.0f, 0.0f, 0.0f);
+glm::vec3 casa_3(11.0f, 0.0f, 55.0f);
+glm::vec3 casa_4(46.0f, 0.0f, 55.0f);
 
-glm::vec3 PosIni1(-95.0f, 1.0f, -45.0f);//para mover al auto
-glm::vec3 PosIniAuto1(-75.0f, 1.0f, -45.0f);//para mover al auto
+glm::vec3 PosIni1(0.0f, 0.0f, 0.0f);//para mover al auto
+glm::vec3 PosIniAuto1(0.0f, 0.0f, 0.0f);//para mover al auto
 bool active;
 
 
@@ -98,13 +101,16 @@ glm::vec3 LightP1;
 //Animación del coche
 float movKitX = 0.0;
 float movKitZ = 0.0;
-float rotKit = 0.0;//orientación de la animación inicial
-
-float movKitX1 = 0.0;
-float movKitZ1 = 0.0;
-float rotKit1 = 90.0;//orientación de la animación inicial
+float rotKit = 90.0;//orientación del auto
 float rotKit_izq = 0.0;//giro de las ruedas izq
 float rotKit_der = 0.0;//giro de las ruedas derechas
+float movKitX1 = 0.0;
+float movKitZ1 = 0.0;
+
+float rotKit1 = 0.0;//orientación de la casa 1
+float rotKit2 = 0.0;//orientación de la casa 2
+float rotKit3 = 180.0;//orientación de la casa 3
+float rotKit4 = 180.0;//orientación de la casa 4
 
 bool circuito = false;
 bool recorrido1 = true;
@@ -216,12 +222,14 @@ int main()
 	Model LLanta((char*)"Models/Carro/Wheel.obj");
 	Model pasto((char *)"Models/pasto/pasto.obj");
 	Model arbusto((char *)"Models/arbusto/arbusto.obj");
+	Model calle((char *)"Models/camino/calle.obj");
 	
 
 	Model cama((char *)"Models/cama/Single_Bed.obj");
 	Model fogata((char *)"Models/fogata/Campfire.obj");
 	Model casa_aa((char *)"Models/villaf/villaF1.obj");
 	Model casa_aa_c((char *)"Models/villaf/villaF_cristales.obj");
+	Model cerca((char *)"Models/villaf/cerca.obj");
 	Model camastro((char *)"Models/sunbed/camastrof.obj");
 	Model mesa((char *)"Models/mesaf/mesaf.obj");
 	Model silla((char *)"Models/mesaf/silla.obj");
@@ -559,8 +567,8 @@ int main()
 		//Carroceria
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto1 + glm::vec3(movKitX1, 0, movKitZ1));
-		model = glm::rotate(model, glm::radians(rotKit1), glm::vec3(0.0f, 1.0f, 0.0));
+		model = glm::translate(model, PosIniAuto1 + glm::vec3(movKitX, 0, movKitZ));
+		model = glm::rotate(model, glm::radians(rotKit), glm::vec3(0.0f, 1.0f, 0.0));
 		model = glm::scale(model, glm::vec3(0.02f, 0.02f, 0.02f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		Carroseria.Draw(lightingShader);
@@ -568,8 +576,8 @@ int main()
 		//Llanta Delantera Der
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto1 + glm::vec3(movKitX1, 0, movKitZ1));
-		model = glm::rotate(model, glm::radians(rotKit1), glm::vec3(0.0f, 1.0f, 0.0));
+		model = glm::translate(model, PosIniAuto1 + glm::vec3(movKitX, 0, movKitZ));
+		model = glm::rotate(model, glm::radians(rotKit), glm::vec3(0.0f, 1.0f, 0.0));
 		model = glm::translate(model, glm::vec3(1.7f, 0.5f, 2.6f));;
 		model = glm::scale(model, glm::vec3(0.02f, 0.02f, 0.02f));
 		//model = glm::rotate(model, glm::radians(rotKit_der), glm::vec3(0.0f, 0.0f, 1.0));
@@ -579,8 +587,8 @@ int main()
 		//Llanta Trasera Der
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto1 + glm::vec3(movKitX1, 0, movKitZ1));
-		model = glm::rotate(model, glm::radians(rotKit1), glm::vec3(0.0f, 1.0f, 0.0));
+		model = glm::translate(model, PosIniAuto1 + glm::vec3(movKitX, 0, movKitZ));
+		model = glm::rotate(model, glm::radians(rotKit), glm::vec3(0.0f, 1.0f, 0.0));
 		model = glm::translate(model, glm::vec3(1.7f, 0.5f, -2.9f));
 		model = glm::scale(model, glm::vec3(0.02f, 0.02f, 0.02f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
@@ -590,8 +598,8 @@ int main()
 		//Llanta Delantera Izq
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto1 + glm::vec3(movKitX1, 0, movKitZ1));
-		model = glm::rotate(model, glm::radians(rotKit1), glm::vec3(0.0, 1.0, 0.0));
+		model = glm::translate(model, PosIniAuto1 + glm::vec3(movKitX, 0, movKitZ));
+		model = glm::rotate(model, glm::radians(rotKit), glm::vec3(0.0, 1.0, 0.0));
 		model = glm::translate(model, glm::vec3(-1.7f, 0.8f, 2.6f));
 		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0, 1.0, 0.0));
 		model = glm::scale(model, glm::vec3(0.02f, 0.02f, 0.02f));
@@ -602,8 +610,8 @@ int main()
 		//Llanta Trasera Izq
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto1 + glm::vec3(movKitX1, 0, movKitZ1));
-		model = glm::rotate(model, glm::radians(rotKit1), glm::vec3(0.0f, 1.0f, 0.0));
+		model = glm::translate(model, PosIniAuto1 + glm::vec3(movKitX, 0, movKitZ));
+		model = glm::rotate(model, glm::radians(rotKit), glm::vec3(0.0f, 1.0f, 0.0));
 		model = glm::translate(model, glm::vec3(-1.7f, 0.8f, -2.9f));
 		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0));
 		model = glm::scale(model, glm::vec3(0.02f, 0.02f, 0.02f));
@@ -612,96 +620,121 @@ int main()
 
 		glBindVertexArray(0);
 
-		//Carga de modelo de lacasa
+		//camino
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, glm::vec3(-15.0f, 0.0f, 37.5f));
+		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0));
+		model = glm::scale(model, glm::vec3(7.6f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		calle.Draw(lightingShader);
+
+		//Carga de modelos
+		//---------------------------------------------------------------------------------------------
+		//---------------------------------------CASA 1------------------------------------------------
+		//---------------------------------------------------------------------------------------------
 		//Villa F
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto + glm::vec3(10, 0, 10));
-		model = glm::rotate(model, glm::radians(rotKit), glm::vec3(0.0f, 1.0f, 0.0));
+		model = glm::translate(model, glm::vec3(10, 0, 10));
+		model = glm::rotate(model, glm::radians(rotKit1), glm::vec3(0.0f, 1.0f, 0.0));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		casa_aa.Draw(lightingShader);
 
+		//Villa F cerca
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, glm::vec3(10, 0, 10));
+		model = glm::rotate(model, glm::radians(rotKit1), glm::vec3(0.0f, 1.0f, 0.0));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		cerca.Draw(lightingShader);
 
 		//casa cristales
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto + glm::vec3(10, 0, 10));
-		model = glm::rotate(model, glm::radians(rotKit), glm::vec3(0.0f, 1.0f, 0.0));
+		model = glm::translate(model, glm::vec3(10, 0, 10));
+		model = glm::rotate(model, glm::radians(rotKit1), glm::vec3(0.0f, 1.0f, 0.0));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		casa_aa_c.Draw(lightingShader);
 
 		//ventanales
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto + glm::vec3(10 + mov_vent, 0, 10));
+		model = glm::translate(model, glm::vec3(10 + mov_vent, 0, 10));
+		model = glm::rotate(model, glm::radians(rotKit1), glm::vec3(0.0f, 1.0f, 0.0));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		ventanales.Draw(lightingShader);
 
 		//ventanales 2
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto + glm::vec3(10 + mov_vent, 0, 10));
+		model = glm::translate(model, glm::vec3(10 + mov_vent, 0, 10));
+		model = glm::rotate(model, glm::radians(rotKit1), glm::vec3(0.0f, 1.0f, 0.0));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		ventanales2.Draw(lightingShader);
 
 		//ventanales 3
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto + glm::vec3(10 + mov_vent, 0, 10));
+		model = glm::translate(model, glm::vec3(10 + mov_vent, 0, 10));
+		model = glm::rotate(model, glm::radians(rotKit1), glm::vec3(0.0f, 1.0f, 0.0));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		ventanales3.Draw(lightingShader);
 
 		//ventanales 4
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto + glm::vec3(10 + mov_vent, 0, 10));
+		model = glm::translate(model, glm::vec3(10 + mov_vent, 0, 10));
+		model = glm::rotate(model, glm::radians(rotKit1), glm::vec3(0.0f, 1.0f, 0.0));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		ventanales4.Draw(lightingShader);
 
 		//puerta
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto + glm::vec3(10, 0, 10));
-		model = glm::rotate(model, glm::radians(abrir1), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::translate(model, glm::vec3(10, 0, 10));
+		model = glm::rotate(model, glm::radians(rotKit1), glm::vec3(0.0f, 1.0f, 0.0));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		puerta.Draw(lightingShader);
 
 		//puerta 2
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto + glm::vec3(10, 0, 10));
-		model = glm::rotate(model, glm::radians(abrir2), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::translate(model, glm::vec3(10, 0, 10));
+		model = glm::rotate(model, glm::radians(rotKit1), glm::vec3(0.0f, 1.0f, 0.0));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		puerta2.Draw(lightingShader);
 
 		//puerta 3
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto + glm::vec3(10, 0, 10));
-		model = glm::rotate(model, glm::radians(abrir3), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::translate(model, glm::vec3(10, 0, 10));
+		model = glm::rotate(model, glm::radians(rotKit1), glm::vec3(0.0f, 1.0f, 0.0));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		puerta3.Draw(lightingShader);
 
 		//puerta4 
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto + glm::vec3(10, 0, 10));
-		model = glm::rotate(model, glm::radians(abrir4), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::translate(model, glm::vec3(10, 0, 10));
+		model = glm::rotate(model, glm::radians(rotKit1), glm::vec3(0.0f, 1.0f, 0.0));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		puerta4.Draw(lightingShader);
 
 		//fogata
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto + glm::vec3(24, -0.4, 22));
+		model = glm::translate(model, glm::vec3(24, -0.4, 22));
 		model = glm::scale(model, glm::vec3(0.3f, 0.3f, 0.3f));
+		model = glm::rotate(model, glm::radians(rotKit1), glm::vec3(0.0f, 1.0f, 0.0));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		fogata.Draw(lightingShader);
 
 		//cama cuarto principal
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto + glm::vec3(10.2, 2.7, 14));
+		model = glm::translate(model, glm::vec3(10.2, 2.7, 14));
+		model = glm::rotate(model, glm::radians(rotKit1), glm::vec3(0.0f, 1.0f, 0.0));
 		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		cama.Draw(lightingShader);
@@ -709,7 +742,8 @@ int main()
 		//cama cuarto del fondo
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto + glm::vec3(21.1, 2.7, 11));
+		model = glm::translate(model, glm::vec3(21.1, 2.7, 11));
+		model = glm::rotate(model, glm::radians(rotKit1), glm::vec3(0.0f, 1.0f, 0.0));
 		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		cama.Draw(lightingShader);
@@ -717,7 +751,8 @@ int main()
 		//camastro 1
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto + glm::vec3(6, 0, 24));
+		model = glm::translate(model, glm::vec3(6, 0, 24));
+		model = glm::rotate(model, glm::radians(rotKit1), glm::vec3(0.0f, 1.0f, 0.0));
 		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		camastro.Draw(lightingShader);
@@ -725,7 +760,8 @@ int main()
 		//camastro 2
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto + glm::vec3(6, 0, 22.7));
+		model = glm::translate(model, glm::vec3(6, 0, 22.7));
+		model = glm::rotate(model, glm::radians(rotKit1), glm::vec3(0.0f, 1.0f, 0.0));
 		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		camastro.Draw(lightingShader);
@@ -733,7 +769,8 @@ int main()
 		//camastro 3 
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto + glm::vec3(6, 0, 21.4));
+		model = glm::translate(model, glm::vec3(6, 0, 21.4));
+		model = glm::rotate(model, glm::radians(rotKit1), glm::vec3(0.0f, 1.0f, 0.0));
 		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		camastro.Draw(lightingShader);
@@ -741,7 +778,8 @@ int main()
 		//camastro 4
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto + glm::vec3(6, 0, 20.1));
+		model = glm::translate(model, glm::vec3(6, 0, 20.1));
+		model = glm::rotate(model, glm::radians(rotKit1), glm::vec3(0.0f, 1.0f, 0.0));
 		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		camastro.Draw(lightingShader);
@@ -749,45 +787,49 @@ int main()
 		//mesa exterior
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto + glm::vec3(16.5, 0, 23));
+		model = glm::translate(model, glm::vec3(16.5, 0, 23));
+		model = glm::rotate(model, glm::radians(rotKit1), glm::vec3(0.0f, 1.0f, 0.0));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		mesa.Draw(lightingShader);
 
 		//mesa estancia
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto + glm::vec3(21, -0.4, 23));
+		model = glm::translate(model, glm::vec3(21, -0.4, 23));
+		model = glm::rotate(model, glm::radians(rotKit1), glm::vec3(0.0f, 1.0f, 0.0));
 		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0));
-		//model = glm::scale(model, glm::vec3(0.3f, 0.3f, 0.3f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		mesa_estancia.Draw(lightingShader);
 
 		//silla exterior 1
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto + glm::vec3(16, 0, 23));
-
+		model = glm::translate(model, glm::vec3(16, 0, 23));
+		model = glm::rotate(model, glm::radians(rotKit1), glm::vec3(0.0f, 1.0f, 0.0));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		silla.Draw(lightingShader);
 
 		//silla exterior 2
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto + glm::vec3(16, 0, 23.8));
+		model = glm::translate(model, glm::vec3(16, 0, 23.8));
+		model = glm::rotate(model, glm::radians(rotKit1), glm::vec3(0.0f, 1.0f, 0.0));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		silla.Draw(lightingShader);
 
 		//silla exterior 3
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto + glm::vec3(16, 0, 24.6));
+		model = glm::translate(model, glm::vec3(16, 0, 24.6));
+		model = glm::rotate(model, glm::radians(rotKit1), glm::vec3(0.0f, 1.0f, 0.0));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		silla.Draw(lightingShader);
 
 		//silla exterior 4
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto + glm::vec3(16, 0, 20.9));
+		model = glm::translate(model, glm::vec3(16, 0, 20.9));
+		model = glm::rotate(model, glm::radians(rotKit1), glm::vec3(0.0f, 1.0f, 0.0));
 		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		silla.Draw(lightingShader);
@@ -795,7 +837,8 @@ int main()
 		//silla exterior 5
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto + glm::vec3(16, 0, 21.5));
+		model = glm::translate(model, glm::vec3(16, 0, 21.5));
+		model = glm::rotate(model, glm::radians(rotKit1), glm::vec3(0.0f, 1.0f, 0.0));
 		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		silla.Draw(lightingShader);
@@ -803,7 +846,8 @@ int main()
 		//silla exterior 6
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto + glm::vec3(16, 0, 22.3));
+		model = glm::translate(model, glm::vec3(16, 0, 22.3));
+		model = glm::rotate(model, glm::radians(rotKit1), glm::vec3(0.0f, 1.0f, 0.0));
 		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		silla.Draw(lightingShader);
@@ -811,7 +855,8 @@ int main()
 		//mesa interior
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto + glm::vec3(13.5, 0, 15));
+		model = glm::translate(model, glm::vec3(13.5, 0, 15));
+		model = glm::rotate(model, glm::radians(rotKit1), glm::vec3(0.0f, 1.0f, 0.0));
 		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0));
 		model = glm::scale(model, glm::vec3(0.7f, 0.7f, 0.7f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
@@ -820,7 +865,8 @@ int main()
 		//silla interior 1
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto + glm::vec3(13.5, 0, 15.2));
+		model = glm::translate(model, glm::vec3(13.5, 0, 15.2));
+		model = glm::rotate(model, glm::radians(rotKit1), glm::vec3(0.0f, 1.0f, 0.0));
 		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0));
 		model = glm::scale(model, glm::vec3(0.7f, 0.7f, 0.7f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
@@ -829,7 +875,8 @@ int main()
 		//silla interior 2
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto + glm::vec3(14, 0, 15.2));
+		model = glm::translate(model, glm::vec3(14, 0, 15.2));
+		model = glm::rotate(model, glm::radians(rotKit1), glm::vec3(0.0f, 1.0f, 0.0));
 		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0));
 		model = glm::scale(model, glm::vec3(0.7f, 0.7f, 0.7f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
@@ -838,7 +885,8 @@ int main()
 		//silla interior 3
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto + glm::vec3(14.5, 0, 15.2));
+		model = glm::translate(model, glm::vec3(14.5, 0, 15.2));
+		model = glm::rotate(model, glm::radians(rotKit1), glm::vec3(0.0f, 1.0f, 0.0));
 		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0));
 		model = glm::scale(model, glm::vec3(0.7f, 0.7f, 0.7f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
@@ -848,7 +896,8 @@ int main()
 		//silla interior 4
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto + glm::vec3(12, 0, 15.5));
+		model = glm::translate(model, glm::vec3(12, 0, 15.5));
+		model = glm::rotate(model, glm::radians(rotKit1), glm::vec3(0.0f, 1.0f, 0.0));
 		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0));
 		model = glm::scale(model, glm::vec3(0.7f, 0.7f, 0.7f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
@@ -857,7 +906,8 @@ int main()
 		//silla interior 5
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto + glm::vec3(12.5, 0, 15.5));
+		model = glm::translate(model, glm::vec3(12.5, 0, 15.5));
+		model = glm::rotate(model, glm::radians(rotKit1), glm::vec3(0.0f, 1.0f, 0.0));
 		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0));
 		model = glm::scale(model, glm::vec3(0.7f, 0.7f, 0.7f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
@@ -866,7 +916,8 @@ int main()
 		//silla interior 6
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto + glm::vec3(13, 0, 15.5));
+		model = glm::translate(model, glm::vec3(13, 0, 15.5));
+		model = glm::rotate(model, glm::radians(rotKit1), glm::vec3(0.0f, 1.0f, 0.0));
 		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0));
 		model = glm::scale(model, glm::vec3(0.7f, 0.7f, 0.7f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
@@ -876,7 +927,8 @@ int main()
 		//alacena
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto + glm::vec3(20.8, 0, 10.5));
+		model = glm::translate(model, glm::vec3(20.8, 0, 10.5));
+		model = glm::rotate(model, glm::radians(rotKit1), glm::vec3(0.0f, 1.0f, 0.0));
 		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0));
 		model = glm::scale(model, glm::vec3(1.0f, 0.9f, 1.0f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
@@ -885,155 +937,797 @@ int main()
 		//alacena
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto + glm::vec3(30, 0, 10.5));
+		model = glm::translate(model, glm::vec3(30, 0, 10.5));
+		model = glm::rotate(model, glm::radians(rotKit1), glm::vec3(0.0f, 1.0f, 0.0));
 		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0));
 		model = glm::scale(model, glm::vec3(1.0f, 0.9f, 1.0f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		alacena.Draw(lightingShader); 
 
-		//arbusto der
+		//---------------------------------------------------------------------------------------------
+		//---------------------------------------CASA 2------------------------------------------------
+		//---------------------------------------------------------------------------------------------
+		//Villa F
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto + glm::vec3(35, 0, 20));
-		model = glm::rotate(model, glm::radians(aire), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::translate(model, casa_2 + glm::vec3(10, 0, 10));
+		model = glm::rotate(model, glm::radians(rotKit2), glm::vec3(0.0f, 1.0f, 0.0));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		arbusto.Draw(lightingShader);
+		casa_aa.Draw(lightingShader);
 
-		//arbusto der
+		//Villa F cerca
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto + glm::vec3(35, 0, 17.5));
-		model = glm::rotate(model, glm::radians(aire), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::translate(model, casa_2 + glm::vec3(10, 0, 10));
+		model = glm::rotate(model, glm::radians(rotKit2), glm::vec3(0.0f, 1.0f, 0.0));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		arbusto.Draw(lightingShader);
+		cerca.Draw(lightingShader);
 
-		//arbusto der
+		//casa cristales
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto + glm::vec3(35, 0, 15));
-		model = glm::rotate(model, glm::radians(aire), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::translate(model, casa_2 + glm::vec3(10, 0, 10));
+		model = glm::rotate(model, glm::radians(rotKit2), glm::vec3(0.0f, 1.0f, 0.0));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		arbusto.Draw(lightingShader);
+		casa_aa_c.Draw(lightingShader);
 
-		//arbusto der
+		//ventanales
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto + glm::vec3(35, 0, 12.5));
-		model = glm::rotate(model, glm::radians(aire), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::translate(model, casa_2 + glm::vec3(10 + mov_vent, 0, 10));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		arbusto.Draw(lightingShader);
+		ventanales.Draw(lightingShader);
 
-		//arbusto der
+		//ventanales 2
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto + glm::vec3(35, 0, 10));
-		model = glm::rotate(model, glm::radians(aire), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::translate(model, casa_2 +  glm::vec3(10 + mov_vent, 0, 10));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		arbusto.Draw(lightingShader);
+		ventanales2.Draw(lightingShader);
 
-		//arbusto der
+		//ventanales 3
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto + glm::vec3(35, 0, 7.5));
-		model = glm::rotate(model, glm::radians(aire), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::translate(model, casa_2 + glm::vec3(10 + mov_vent, 0, 10));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		arbusto.Draw(lightingShader);
+		ventanales3.Draw(lightingShader);
 
-		//arbusto der
+		//ventanales 4
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto + glm::vec3(35, 0, 5));
-		model = glm::rotate(model, glm::radians(aire), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::translate(model, casa_2 + glm::vec3(10 + mov_vent, 0, 10));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		arbusto.Draw(lightingShader);
+		ventanales4.Draw(lightingShader);
 
-		//arbusto der
+		//puerta
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto + glm::vec3(35, 0, 2.5));
-		model = glm::rotate(model, glm::radians(aire), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::translate(model, casa_2 + glm::vec3(10, 0, 10));
+		model = glm::rotate(model, glm::radians(abrir1), glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		puerta.Draw(lightingShader);
 
-		arbusto.Draw(lightingShader);
-		//arbusto der
+		//puerta 2
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto + glm::vec3(35, 0, 0));
-		model = glm::rotate(model, glm::radians(aire), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::translate(model, casa_2 + glm::vec3(10, 0, 10));
+		model = glm::rotate(model, glm::radians(abrir2), glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		arbusto.Draw(lightingShader);
+		puerta2.Draw(lightingShader);
 
-		//arbusto izq
+		//puerta 3
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto + glm::vec3(-15, 0, 0));
-		model = glm::rotate(model, glm::radians(aire), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::translate(model, casa_2 + glm::vec3(10, 0, 10));
+		model = glm::rotate(model, glm::radians(abrir3), glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		arbusto.Draw(lightingShader);
+		puerta3.Draw(lightingShader);
 
-		//arbusto izq
+		//puerta4 
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto + glm::vec3(-15, 0, 2.5));
-		model = glm::rotate(model, glm::radians(aire), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::translate(model, casa_2 + glm::vec3(10, 0, 10));
+		model = glm::rotate(model, glm::radians(abrir4), glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		arbusto.Draw(lightingShader);
+		puerta4.Draw(lightingShader);
 
-		//arbusto izq
+		//fogata
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto + glm::vec3(-15, 0, 5));
-		model = glm::rotate(model, glm::radians(aire), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::translate(model, casa_2 + glm::vec3(24, -0.4, 22));
+		model = glm::scale(model, glm::vec3(0.3f, 0.3f, 0.3f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		arbusto.Draw(lightingShader);
+		fogata.Draw(lightingShader);
 
-		//arbusto izq
+		//cama cuarto principal
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto + glm::vec3(-15, 0, 7.5));
-		model = glm::rotate(model, glm::radians(aire), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::translate(model, casa_2 + glm::vec3(10.2, 2.7, 14));
+		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		cama.Draw(lightingShader);
 
-		//arbusto izq
+		//cama cuarto del fondo
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto + glm::vec3(-15, 0, 10));
-		model = glm::rotate(model, glm::radians(aire), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::translate(model, casa_2 + glm::vec3(21.1, 2.7, 11));
+		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		arbusto.Draw(lightingShader);
+		cama.Draw(lightingShader);
 
-		//arbusto izq
+		//camastro 1
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto + glm::vec3(-15, 0, 12.5));
-		model = glm::rotate(model, glm::radians(aire), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::translate(model, casa_2 + glm::vec3(6, 0, 24));
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		arbusto.Draw(lightingShader);
+		camastro.Draw(lightingShader);
 
-		//arbusto izq
+		//camastro 2
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto + glm::vec3(-15, 0, 15));
-		model = glm::rotate(model, glm::radians(aire), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::translate(model, casa_2 + glm::vec3(6, 0, 22.7));
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		arbusto.Draw(lightingShader);
-		
-		//arbusto izq
-		view = camera.GetViewMatrix();
-		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto + glm::vec3(-15, 0, 17.5));
-		model = glm::rotate(model, glm::radians(aire), glm::vec3(0.0f, 0.0f, 1.0f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		arbusto.Draw(lightingShader);
+		camastro.Draw(lightingShader);
 
-		//arbusto izq
+		//camastro 3 
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto + glm::vec3(-15, 0, 20));
-		model = glm::rotate(model, glm::radians(aire), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::translate(model, casa_2 + glm::vec3(6, 0, 21.4));
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		arbusto.Draw(lightingShader);
+		camastro.Draw(lightingShader);
 
+		//camastro 4
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, casa_2 + glm::vec3(6, 0, 20.1));
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		camastro.Draw(lightingShader);
+
+		//mesa exterior
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, casa_2 + glm::vec3(16.5, 0, 23));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		mesa.Draw(lightingShader);
+
+		//mesa estancia
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, casa_2 + glm::vec3(21, -0.4, 23));
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0));
+		//model = glm::scale(model, glm::vec3(0.3f, 0.3f, 0.3f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		mesa_estancia.Draw(lightingShader);
+
+		//silla exterior 1
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, casa_2 + glm::vec3(16, 0, 23));
+
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		silla.Draw(lightingShader);
+
+		//silla exterior 2
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, casa_2 + glm::vec3(16, 0, 23.8));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		silla.Draw(lightingShader);
+
+		//silla exterior 3
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, casa_2 + glm::vec3(16, 0, 24.6));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		silla.Draw(lightingShader);
+
+		//silla exterior 4
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, casa_2 + glm::vec3(16, 0, 20.9));
+		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		silla.Draw(lightingShader);
+
+		//silla exterior 5
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, casa_2 + glm::vec3(16, 0, 21.5));
+		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		silla.Draw(lightingShader);
+
+		//silla exterior 6
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, casa_2 + glm::vec3(16, 0, 22.3));
+		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		silla.Draw(lightingShader);
+
+		//mesa interior
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, casa_2 + glm::vec3(13.5, 0, 15));
+		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0));
+		model = glm::scale(model, glm::vec3(0.7f, 0.7f, 0.7f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		mesa.Draw(lightingShader);
+
+		//silla interior 1
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, casa_2 + glm::vec3(13.5, 0, 15.2));
+		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0));
+		model = glm::scale(model, glm::vec3(0.7f, 0.7f, 0.7f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		silla.Draw(lightingShader);
+
+		//silla interior 2
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, casa_2 + glm::vec3(14, 0, 15.2));
+		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0));
+		model = glm::scale(model, glm::vec3(0.7f, 0.7f, 0.7f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		silla.Draw(lightingShader);
+
+		//silla interior 3
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, casa_2 + glm::vec3(14.5, 0, 15.2));
+		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0));
+		model = glm::scale(model, glm::vec3(0.7f, 0.7f, 0.7f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		silla.Draw(lightingShader);
+
+
+		//silla interior 4
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, casa_2 + glm::vec3(12, 0, 15.5));
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0));
+		model = glm::scale(model, glm::vec3(0.7f, 0.7f, 0.7f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		silla.Draw(lightingShader);
+
+		//silla interior 5
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, casa_2 + glm::vec3(12.5, 0, 15.5));
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0));
+		model = glm::scale(model, glm::vec3(0.7f, 0.7f, 0.7f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		silla.Draw(lightingShader);
+
+		//silla interior 6
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, casa_2 + glm::vec3(13, 0, 15.5));
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0));
+		model = glm::scale(model, glm::vec3(0.7f, 0.7f, 0.7f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		silla.Draw(lightingShader);
+
+
+		//alacena
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, casa_2 + glm::vec3(20.8, 0, 10.5));
+		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0));
+		model = glm::scale(model, glm::vec3(1.0f, 0.9f, 1.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		alacena.Draw(lightingShader);
+
+		//alacena
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, casa_2 + glm::vec3(30, 0, 10.5));
+		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0));
+		model = glm::scale(model, glm::vec3(1.0f, 0.9f, 1.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		alacena.Draw(lightingShader);
+
+	
+		//---------------------------------------------------------------------------------------------
+		//---------------------------------------CASA 3------------------------------------------------
+		//---------------------------------------------------------------------------------------------
+		//Villa F
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, casa_3 + glm::vec3(10, 0, 10));
+		model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		casa_aa.Draw(lightingShader);
+
+		//Villa F cerca
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, casa_3 + glm::vec3(10, 0, 10));
+		model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		cerca.Draw(lightingShader);
+
+		//casa cristales
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, casa_3 + glm::vec3(10 + mov_vent, 0, 10));
+		model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		casa_aa_c.Draw(lightingShader);
+
+		//ventanales
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, casa_3 + glm::vec3(10 + mov_vent, 0, 10));
+		model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		ventanales.Draw(lightingShader);
+
+		//ventanales 2
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, casa_3 + glm::vec3(10 + mov_vent, 0, 10));
+		model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		ventanales2.Draw(lightingShader);
+
+		//ventanales 3
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, casa_3 + glm::vec3(10 + mov_vent, 0, 10));
+		model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		ventanales3.Draw(lightingShader);
+
+		//ventanales 4
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, casa_3 + glm::vec3(10 + mov_vent, 0, 10));
+		model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		ventanales4.Draw(lightingShader);
+
+		//puerta
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, casa_3 + glm::vec3(10, 0, 10));
+		model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		puerta.Draw(lightingShader);
+
+		//puerta 2
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, casa_3 + glm::vec3(10, 0, 10));
+		model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		puerta2.Draw(lightingShader);
+
+		//puerta 3
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, casa_3 + glm::vec3(10, 0, 10));
+		model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		puerta3.Draw(lightingShader);
+
+		//puerta4 
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, casa_3 + glm::vec3(10, 0, 10));
+		model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		puerta4.Draw(lightingShader);
+
+		////fogata
+		//view = camera.GetViewMatrix();
+		//model = glm::mat4(1);
+		//model = glm::translate(model, casa_3 + glm::vec3(24, -0.4, 22));
+		//model = glm::scale(model, glm::vec3(0.3f, 0.3f, 0.3f));
+		//model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//fogata.Draw(lightingShader);
+
+		////cama cuarto principal
+		//view = camera.GetViewMatrix();
+		//model = glm::mat4(1);
+		//model = glm::translate(model, casa_3 + glm::vec3(10.2, 2.7, 14));
+		//model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
+		//model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//cama.Draw(lightingShader);
+
+		////cama cuarto del fondo
+		//view = camera.GetViewMatrix();
+		//model = glm::mat4(1);
+		//model = glm::translate(model, casa_3 + glm::vec3(21.1, 2.7, 11));
+		//model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
+		//model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//cama.Draw(lightingShader);
+
+		////camastro 1
+		//view = camera.GetViewMatrix();
+		//model = glm::mat4(1);
+		//model = glm::translate(model, casa_3 + glm::vec3(6, 0, 24));
+		//model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
+		//model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//camastro.Draw(lightingShader);
+
+		////camastro 2
+		//view = camera.GetViewMatrix();
+		//model = glm::mat4(1);
+		//model = glm::translate(model, casa_3 + glm::vec3(6, 0, 22.7));
+		//model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
+		//model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//camastro.Draw(lightingShader);
+
+		////camastro 3 
+		//view = camera.GetViewMatrix();
+		//model = glm::mat4(1);
+		//model = glm::translate(model, casa_3 + glm::vec3(6, 0, 21.4));
+		//model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
+		//model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//camastro.Draw(lightingShader);
+
+		////camastro 4
+		//view = camera.GetViewMatrix();
+		//model = glm::mat4(1);
+		//model = glm::translate(model, casa_3 + glm::vec3(6, 0, 20.1));
+		//model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
+		//model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//camastro.Draw(lightingShader);
+
+		////mesa exterior
+		//view = camera.GetViewMatrix();
+		//model = glm::mat4(1);
+		//model = glm::translate(model, casa_3 + glm::vec3(16.5, 0, 23));
+		//model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//mesa.Draw(lightingShader);
+
+		////mesa estancia
+		//view = camera.GetViewMatrix();
+		//model = glm::mat4(1);
+		//model = glm::translate(model, casa_3 + glm::vec3(21, -0.4, 23));
+		//model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
+		//model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//mesa_estancia.Draw(lightingShader);
+
+		////silla exterior 1
+		//view = camera.GetViewMatrix();
+		//model = glm::mat4(1);
+		//model = glm::translate(model, casa_3 + glm::vec3(16, 0, 23));
+		//model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//silla.Draw(lightingShader);
+
+		////silla exterior 2
+		//view = camera.GetViewMatrix();
+		//model = glm::mat4(1);
+		//model = glm::translate(model, casa_3 + glm::vec3(16, 0, 23.8));
+		//model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//silla.Draw(lightingShader);
+
+		////silla exterior 3
+		//view = camera.GetViewMatrix();
+		//model = glm::mat4(1);
+		//model = glm::translate(model, casa_3 + glm::vec3(16, 0, 24.6));
+		//model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//silla.Draw(lightingShader);
+
+		////silla exterior 4
+		//view = camera.GetViewMatrix();
+		//model = glm::mat4(1);
+		//model = glm::translate(model, casa_3 + glm::vec3(16, 0, 20.9));
+		//model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
+		//model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//silla.Draw(lightingShader);
+
+		////silla exterior 5
+		//view = camera.GetViewMatrix();
+		//model = glm::mat4(1);
+		//model = glm::translate(model, casa_3 + glm::vec3(16, 0, 21.5));
+		//model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
+		//model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//silla.Draw(lightingShader);
+
+		////silla exterior 6
+		//view = camera.GetViewMatrix();
+		//model = glm::mat4(1);
+		//model = glm::translate(model, casa_3 + glm::vec3(16, 0, 23.3));
+		//model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
+		//model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//silla.Draw(lightingShader);
+
+		////mesa interior
+		//view = camera.GetViewMatrix();
+		//model = glm::mat4(1);
+		//model = glm::translate(model, casa_3 + glm::vec3(13.5, 0, 15));
+		//model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
+		//model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0));
+		//model = glm::scale(model, glm::vec3(0.7f, 0.7f, 0.7f));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//mesa.Draw(lightingShader);
+
+		////silla interior 1
+		//view = camera.GetViewMatrix();
+		//model = glm::mat4(1);
+		//model = glm::translate(model, casa_3 + glm::vec3(13.5, 0, 15.2));
+		//model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
+		//model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0));
+		//model = glm::scale(model, glm::vec3(0.7f, 0.7f, 0.7f));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//silla.Draw(lightingShader);
+
+		////silla interior 2
+		//view = camera.GetViewMatrix();
+		//model = glm::mat4(1);
+		//model = glm::translate(model, casa_3 + glm::vec3(14, 0, 15.2));
+		//model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
+		//model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0));
+		//model = glm::scale(model, glm::vec3(0.7f, 0.7f, 0.7f));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//silla.Draw(lightingShader);
+
+		////silla interior 3
+		//view = camera.GetViewMatrix();
+		//model = glm::mat4(1);
+		//model = glm::translate(model, casa_3 + glm::vec3(14.5, 0, 15.2));
+		//model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
+		//model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0));
+		//model = glm::scale(model, glm::vec3(0.7f, 0.7f, 0.7f));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//silla.Draw(lightingShader);
+
+
+		////silla interior 4
+		//view = camera.GetViewMatrix();
+		//model = glm::mat4(1);
+		//model = glm::translate(model, casa_3 + glm::vec3(12, 0, 15.5));
+		//model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
+		//model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0));
+		//model = glm::scale(model, glm::vec3(0.7f, 0.7f, 0.7f));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//silla.Draw(lightingShader);
+
+		////silla interior 5
+		//view = camera.GetViewMatrix();
+		//model = glm::mat4(1);
+		//model = glm::translate(model, casa_3 + glm::vec3(12.5, 0, 15.5));
+		//model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
+		//model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0));
+		//model = glm::scale(model, glm::vec3(0.7f, 0.7f, 0.7f));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//silla.Draw(lightingShader);
+
+		////silla interior 6
+		//view = camera.GetViewMatrix();
+		//model = glm::mat4(1);
+		//model = glm::translate(model, casa_3 + glm::vec3(13, 0, 15.5));
+		//model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
+		//model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0));
+		//model = glm::scale(model, glm::vec3(0.7f, 0.7f, 0.7f));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//silla.Draw(lightingShader);
+
+
+		////alacena
+		//view = camera.GetViewMatrix();
+		//model = glm::mat4(1);
+		//model = glm::translate(model, casa_3 + glm::vec3(20.8, 0, 10.5));
+		//model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
+		//model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0));
+		//model = glm::scale(model, glm::vec3(1.0f, 0.9f, 1.0f));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//alacena.Draw(lightingShader);
+
+		////alacena
+		//view = camera.GetViewMatrix();
+		//model = glm::mat4(1);
+		//model = glm::translate(model, casa_3 + glm::vec3(30, 0, 10.5));
+		//model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
+		//model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0));
+		//model = glm::scale(model, glm::vec3(1.0f, 0.9f, 1.0f));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//alacena.Draw(lightingShader);
+
+//---------------------------------------------------------------------------------------------
+		//---------------------------------------CASA 3------------------------------------------------
+		//---------------------------------------------------------------------------------------------
+		//Villa F
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, casa_3 + glm::vec3(10, 0, 10));
+		model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		casa_aa.Draw(lightingShader);
+
+		//Villa F cerca
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, casa_3 + glm::vec3(10, 0, 10));
+		model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		cerca.Draw(lightingShader);
+
+		//casa cristales
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, casa_3 + glm::vec3(10 + mov_vent, 0, 10));
+		model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		casa_aa_c.Draw(lightingShader);
+
+		//ventanales
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, casa_3 + glm::vec3(10 + mov_vent, 0, 10));
+		model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		ventanales.Draw(lightingShader);
+
+		//ventanales 2
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, casa_3 + glm::vec3(10 + mov_vent, 0, 10));
+		model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		ventanales2.Draw(lightingShader);
+
+		//ventanales 3
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, casa_3 + glm::vec3(10 + mov_vent, 0, 10));
+		model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		ventanales3.Draw(lightingShader);
+
+		//ventanales 4
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, casa_3 + glm::vec3(10 + mov_vent, 0, 10));
+		model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		ventanales4.Draw(lightingShader);
+
+		//puerta
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, casa_3 + glm::vec3(10, 0, 10));
+		model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		puerta.Draw(lightingShader);
+
+		//puerta 2
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, casa_3 + glm::vec3(10, 0, 10));
+		model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		puerta2.Draw(lightingShader);
+
+		//puerta 3
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, casa_3 + glm::vec3(10, 0, 10));
+		model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		puerta3.Draw(lightingShader);
+
+		//puerta4 
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, casa_3 + glm::vec3(10, 0, 10));
+		model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		puerta4.Draw(lightingShader);
+
+		//---------------------------------------------------------------------------------------------
+		//---------------------------------------CASA 4------------------------------------------------
+		//---------------------------------------------------------------------------------------------
+		//Villa F
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, casa_4 + glm::vec3(10, 0, 10));
+		model = glm::rotate(model, glm::radians(rotKit4), glm::vec3(0.0f, 1.0f, 0.0));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		casa_aa.Draw(lightingShader);
+
+		//Villa F cerca
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, casa_4 + glm::vec3(10, 0, 10));
+		model = glm::rotate(model, glm::radians(rotKit4), glm::vec3(0.0f, 1.0f, 0.0));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		cerca.Draw(lightingShader);
+
+		//casa cristales
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, casa_4 + glm::vec3(10 + mov_vent, 0, 10));
+		model = glm::rotate(model, glm::radians(rotKit4), glm::vec3(0.0f, 1.0f, 0.0));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		casa_aa_c.Draw(lightingShader);
+
+		//ventanales
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, casa_4 + glm::vec3(10 + mov_vent, 0, 10));
+		model = glm::rotate(model, glm::radians(rotKit4), glm::vec3(0.0f, 1.0f, 0.0));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		ventanales.Draw(lightingShader);
+
+		//ventanales 2
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, casa_4 + glm::vec3(10 + mov_vent, 0, 10));
+		model = glm::rotate(model, glm::radians(rotKit4), glm::vec3(0.0f, 1.0f, 0.0));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		ventanales2.Draw(lightingShader);
+
+		//ventanales 3
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, casa_4 + glm::vec3(10 + mov_vent, 0, 10));
+		model = glm::rotate(model, glm::radians(rotKit4), glm::vec3(0.0f, 1.0f, 0.0));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		ventanales3.Draw(lightingShader);
+
+		//ventanales 4
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, casa_4 + glm::vec3(10 + mov_vent, 0, 10));
+		model = glm::rotate(model, glm::radians(rotKit4), glm::vec3(0.0f, 1.0f, 0.0));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		ventanales4.Draw(lightingShader);
+
+		//puerta
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, casa_4 + glm::vec3(10, 0, 10));
+		model = glm::rotate(model, glm::radians(rotKit4), glm::vec3(0.0f, 1.0f, 0.0));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		puerta.Draw(lightingShader);
+
+		//puerta 2
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, casa_4 + glm::vec3(10, 0, 10));
+		model = glm::rotate(model, glm::radians(rotKit4), glm::vec3(0.0f, 1.0f, 0.0));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		puerta2.Draw(lightingShader);
+
+		//puerta 3
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, casa_4 + glm::vec3(10, 0, 10));
+		model = glm::rotate(model, glm::radians(rotKit4), glm::vec3(0.0f, 1.0f, 0.0));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		puerta3.Draw(lightingShader);
+
+		//puerta4 
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, casa_4 + glm::vec3(10, 0, 10));
+		model = glm::rotate(model, glm::radians(rotKit4), glm::vec3(0.0f, 1.0f, 0.0));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		puerta4.Draw(lightingShader);
 
 		// Also draw the lamp object, again binding the appropriate shader
 		lampShader.Use();
@@ -1307,17 +2001,12 @@ void animacion()
 	//Movimiento del coche
 	if (circuito)
 	{
-		/*rotKit_der = 0;
-		rotKit_der += 0.01f;
-
-		rotKit_izq = 0;
-		rotKit_izq += 0.01f;*/
 
 		if (recorrido1)
 		{
-			rotKit1 = 90;
-			movKitX1 += 0.1f;
-			if (movKitX1 > 30)
+			rotKit = 90;
+			movKitX += 0.3f;
+			if (movKitX > 30)
 			{
 				recorrido1 = false;
 				recorrido2 = true;
@@ -1326,9 +2015,9 @@ void animacion()
 		}
 		if (recorrido2)
 		{
-			rotKit1 = 0;
-			movKitZ1 += 0.1f;
-			if (movKitZ1 > 30)
+			rotKit = 0;
+			movKitZ += 0.3f;
+			if (movKitZ > 30)
 			{
 				recorrido2 = false;
 				recorrido3 = true;
@@ -1336,9 +2025,9 @@ void animacion()
 		}
 		if (recorrido3)
 		{
-			rotKit1 = 270;
-			movKitX1 -= 0.1f;
-			if (movKitX1 < 0)
+			rotKit = 270;
+			movKitX -= 0.3f;
+			if (movKitX < 0)
 			{
 				recorrido3 = false;
 				recorrido4 = true;
@@ -1346,9 +2035,9 @@ void animacion()
 		}
 		if (recorrido4)
 		{
-			rotKit1 = 180;
-			movKitZ1 -= 0.1f;
-			if (movKitZ1 < 0)
+			rotKit = 180;
+			movKitZ -= 0.3f;
+			if (movKitZ < 0)
 			{
 				recorrido4 = false;
 				recorrido5 = true;
@@ -1356,9 +2045,9 @@ void animacion()
 		}
 		if (recorrido5)
 		{
-			rotKit1 = 90;
-			movKitZ1 += 0.1f;
-			if (movKitZ1 > 0)
+			rotKit = 90;
+			movKitZ += 0.3f;
+			if (movKitZ > 0)
 			{
 				recorrido5 = false;
 				recorrido1 = true;
