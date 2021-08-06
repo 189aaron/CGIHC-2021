@@ -47,14 +47,14 @@ float rot = 90.0f;
 
 // Light attributes
 glm::vec3 lightPos(0.0f, 0.0f, 0.0f);
-glm::vec3 PosIni(-25.0f, 1.0f, -15.0f);
+glm::vec3 PosIni(-25.0f, 0.0f, -15.0f);
 glm::vec3 PosIniAuto(-15.0f, 0.0f, -15.0f);
 glm::vec3 casa_2(35.0f, 0.0f, 0.0f);
-glm::vec3 casa_3(11.0f, 0.0f, 55.0f);
-glm::vec3 casa_4(46.0f, 0.0f, 55.0f);
+glm::vec3 casa_3(9.0f, 0.0f, 55.0f);
+glm::vec3 casa_4(44.0f, 0.0f, 55.0f);
 
 glm::vec3 PosIni1(0.0f, 0.0f, 0.0f);//para mover al auto
-glm::vec3 PosIniAuto1(0.0f, 0.0f, 0.0f);//para mover al auto
+glm::vec3 PosIniAuto1(0.0f, 0.0f, 15.0f);//para mover al auto
 bool active;
 
 
@@ -101,7 +101,7 @@ glm::vec3 LightP1;
 //Animación del coche
 float movKitX = 0.0;
 float movKitZ = 0.0;
-float rotKit = 90.0;//orientación del auto
+float rotKit = 0.0;//orientación del auto
 float rotKit_izq = 0.0;//giro de las ruedas izq
 float rotKit_der = 0.0;//giro de las ruedas derechas
 float movKitX1 = 0.0;
@@ -229,6 +229,8 @@ int main()
 	Model fogata((char *)"Models/fogata/Campfire.obj");
 	Model casa_aa((char *)"Models/villaf/villaF1.obj");
 	Model casa_aa_c((char *)"Models/villaf/villaF_cristales.obj");
+
+	Model perrito((char *)"Models/perro/cherry.obj");
 	Model cerca((char *)"Models/villaf/cerca.obj");
 	Model camastro((char *)"Models/sunbed/camastrof.obj");
 	Model mesa((char *)"Models/mesaf/mesaf.obj");
@@ -600,7 +602,7 @@ int main()
 		model = glm::mat4(1);
 		model = glm::translate(model, PosIniAuto1 + glm::vec3(movKitX, 0, movKitZ));
 		model = glm::rotate(model, glm::radians(rotKit), glm::vec3(0.0, 1.0, 0.0));
-		model = glm::translate(model, glm::vec3(-1.7f, 0.8f, 2.6f));
+		model = glm::translate(model, glm::vec3(-1.7f, 0.5f, 2.6f));
 		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0, 1.0, 0.0));
 		model = glm::scale(model, glm::vec3(0.02f, 0.02f, 0.02f));
 		//model = glm::rotate(model, glm::radians(rotKit_izq), glm::vec3(0.0, 0.0, 1.0));//vista de frente
@@ -623,7 +625,7 @@ int main()
 		//camino
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(-15.0f, 0.0f, 37.5f));
+		model = glm::translate(model, glm::vec3(-17.0f, 0.0f, 37.5f));
 		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0));
 		model = glm::scale(model, glm::vec3(7.6f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
@@ -943,6 +945,14 @@ int main()
 		model = glm::scale(model, glm::vec3(1.0f, 0.9f, 1.0f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		alacena.Draw(lightingShader); 
+
+		//Perrito
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, PosIniAuto1 + glm::vec3(30, 0, 10));
+		model = glm::rotate(model, glm::radians(rotKit1), glm::vec3(0.0f, 1.0f, 0.0));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		perrito.Draw(lightingShader);
 
 		//---------------------------------------------------------------------------------------------
 		//---------------------------------------CASA 2------------------------------------------------
