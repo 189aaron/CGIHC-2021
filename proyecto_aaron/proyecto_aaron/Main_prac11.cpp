@@ -32,31 +32,29 @@ void DoMovement();
 void animacion();
 
 // Window dimensions
-const GLuint WIDTH = 1024, HEIGHT = 720;
+const GLuint WIDTH = 1024, HEIGHT = 680;
 int SCREEN_WIDTH, SCREEN_HEIGHT;
 
 // Camera
-Camera  camera(glm::vec3(5.0f, 3.0f, 35.0f));
-GLfloat lastX = WIDTH / 2.0;
-GLfloat lastY = HEIGHT / 2.0;
+Camera  camera(glm::vec3(52.0f, 1.5f, 61.0f));
+GLfloat lastX = WIDTH / 3.0;
+GLfloat lastY = HEIGHT / 3.0;
+
 bool keys[1024];
 bool firstMouse = true;
 float range = 0.0f;
 float rot = 90.0f;
 
 
-// Light attributes
 glm::vec3 lightPos(0.0f, 0.0f, 0.0f);
 glm::vec3 PosIni(-25.0f, 0.0f, -15.0f);
 glm::vec3 PosIniAuto(-15.0f, 0.0f, -15.0f);
-glm::vec3 casa_2(35.0f, 0.0f, 0.0f);
-glm::vec3 casa_3(9.0f, 0.0f, 55.0f);
-glm::vec3 casa_4(44.0f, 0.0f, 55.0f);
 
 glm::vec3 PosIni1(0.0f, 0.0f, 0.0f);//para mover al auto
 glm::vec3 PosIniAuto1(0.0f, 0.0f, 15.0f);//para mover al auto
-bool active;
 
+
+bool active;
 
 // Deltatime
 GLfloat deltaTime = 0.0f;	// Time between current frame and last frame
@@ -98,6 +96,16 @@ glm::vec3 pointLightPositions[] = {
 
 glm::vec3 LightP1;
 
+//posicions iniciales
+glm::vec3 casa_2(35.0f, 0.0f, 0.0f);
+glm::vec3 casa_3(9.0f, 0.0f, 55.0f);
+glm::vec3 casa_4(44.0f, 0.0f, 55.0f);
+
+glm::vec3 pos_bmw(34.5, 0, 22);
+glm::vec3 pos_tesla(65, 0, 40.5);
+glm::vec3 pos_perro_casa(30, 0, 25);
+glm::vec3 pos_perro_fuente(105, 0.2, 37.5);
+
 //Animación del coche
 float movKitX = 0.0;
 float movKitZ = 0.0;
@@ -107,17 +115,48 @@ float rotKit_der = 0.0;//giro de las ruedas derechas
 float movKitX1 = 0.0;
 float movKitZ1 = 0.0;
 
+float tesla_rot = 90.0f;//para mover el angulo del auto
+float bmw_rot = 0.0f;//para mover el angulo del auto
+float perro_rot_casa = 0.0f;//para mover al perro de la fuente
+float perro_rot_fuente = 0.0f;//para mover al perro de la fuente
+
+float mov_tesla_x; 
+float mov_tesla_z;
+
+float mov_bmw_x;
+float mov_bmw_z;
+
+float mov_perro_fuente_x;
+float mov_perro_fuente_y;
+float mov_perro_fuente_z;
+
+float mov_perro_casa_x;
+float mov_perro_casa_y;
+float mov_perro_casa_z;
+
 float rotKit1 = 0.0;//orientación de la casa 1
 float rotKit2 = 0.0;//orientación de la casa 2
 float rotKit3 = 180.0;//orientación de la casa 3
 float rotKit4 = 180.0;//orientación de la casa 4
 
-bool circuito = false;
+bool circuito = true;
 bool recorrido1 = true;
 bool recorrido2 = false;
 bool recorrido3 = false;
 bool recorrido4 = false;
 bool recorrido5 = false;
+
+bool tesla_circuito = true;
+bool tesla_recorrido_1 = true;
+bool tesla_recorrido_2 = false;
+bool tesla_recorrido_3 = false;
+bool tesla_recorrido_4 = false;
+bool tesla_recorrido_5 = false;
+bool tesla_recorrido_6 = false;
+
+bool perrito_animacion_fuente = true;
+bool perrito_sube = false;
+bool perrito_baja = false;
 
 float abrir1 = 0.0;
 float abrir2 = 0.0;
@@ -220,9 +259,13 @@ int main()
 
 	Model Carroseria((char*)"Models/Carro/Carroseria.obj");
 	Model LLanta((char*)"Models/Carro/Wheel.obj");
+	Model bmw((char*)"Models/bmw/bmw.obj");
+	Model tesla((char*)"Models/tesla/tesla.obj");
+
 	Model pasto((char *)"Models/pasto/pasto.obj");
 	Model arbusto((char *)"Models/arbusto/arbusto.obj");
 	Model calle((char *)"Models/camino/calle.obj");
+	Model lampara((char *)"Models/lamp_calle/lampara.obj");
 	
 
 	Model cama((char *)"Models/cama/Single_Bed.obj");
@@ -483,7 +526,7 @@ int main()
 		// == ==========================
 		// Directional light
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "dirLight.direction"), -0.2f, -1.0f, -0.3f);
-		glUniform3f(glGetUniformLocation(lightingShader.Program, "dirLight.ambient"), 0.8f, 0.8f, 0.8f);
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "dirLight.ambient"), 0.2f, 0.2f, 0.2f);
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "dirLight.diffuse"), 0.4f, 0.4f, 0.4f);
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "dirLight.specular"), 0.5f, 0.5f, 0.5f);
 
@@ -563,9 +606,172 @@ int main()
 		view = camera.GetViewMatrix();
 		glm::mat4 model(1);
 		tmp = model = glm::translate(model, glm::vec3(0, 1, 0));
+		
+		//---------------------------------------------------------------------------------------------
+		//---------------------------------------Exterior------------------------------------------------
+		//---------------------------------------------------------------------------------------------
+		//camino
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, glm::vec3(-17.0f, 0.0f, 37.5f));
+		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0));
+		model = glm::scale(model, glm::vec3(7.6f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		calle.Draw(lightingShader);
 
-	
-		//Carga de modelo del auto
+		//Perrito en la fuente
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, pos_perro_fuente + glm::vec3(mov_perro_fuente_x, mov_perro_fuente_y, mov_perro_fuente_z));
+		model = glm::rotate(model, glm::radians(perro_rot_fuente), glm::vec3(0.0f, 1.0f, 0.0));
+		model = glm::scale(model, glm::vec3(2.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		perrito.Draw(lightingShader);
+
+		//lampara de calle der 1
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, glm::vec3(-3.0f, 0.0f, 42.5f));
+		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0));
+		model = glm::scale(model, glm::vec3(1.0f, 2.0f, 1.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		lampara.Draw(lightingShader);
+
+		//lampara de calle  der 2 
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, glm::vec3(24.5f, 0.0f, 42.5f));
+		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0));
+		model = glm::scale(model, glm::vec3(1.0f, 2.0f, 1.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		lampara.Draw(lightingShader);
+
+		//lampara de calle  der 3
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, glm::vec3(60.0f, 0.0f, 42.5f));
+		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0));
+		model = glm::scale(model, glm::vec3(1.0f, 2.0f, 1.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		lampara.Draw(lightingShader);
+
+		//lampara de calle izq 1
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, glm::vec3(5.0f, 0.0f, 32.5f));
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0));
+		model = glm::scale(model, glm::vec3(1.0f, 2.0f, 1.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		lampara.Draw(lightingShader);
+
+		//lampara de calle  izq 2 
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, glm::vec3(32.0f, 0.0f, 32.5f));
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0));
+		model = glm::scale(model, glm::vec3(1.0f, 2.0f, 1.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		lampara.Draw(lightingShader);
+
+		//lampara de calle  izq 3
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, glm::vec3(65.0f, 0.0f, 32.5f));
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0));
+		model = glm::scale(model, glm::vec3(1.0f, 2.0f, 1.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		lampara.Draw(lightingShader);
+
+
+		//lampara de calle glorieta
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, glm::vec3(78.5f, 0.0f, 65.0f));
+		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0.0f, 1.0f, 0.0));
+		model = glm::scale(model, glm::vec3(1.0f, 2.0f, 1.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		lampara.Draw(lightingShader);
+
+		//lampara de calle glorieta
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, glm::vec3(105.0f, 0.0f, 74.0f));
+		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0));
+		model = glm::scale(model, glm::vec3(1.0f, 2.0f, 1.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		lampara.Draw(lightingShader);
+
+
+		//lampara de calle glorieta
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, glm::vec3(130.5f, 0.0f, 63.0f));
+		model = glm::rotate(model, glm::radians(135.0f), glm::vec3(0.0f, 1.0f, 0.0));
+		model = glm::scale(model, glm::vec3(1.0f, 2.0f, 1.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		lampara.Draw(lightingShader);
+
+
+		//lampara de calle glorieta
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, glm::vec3(141.0f, 0.0f, 37.0f));
+		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0));
+		model = glm::scale(model, glm::vec3(1.0f, 2.0f, 1.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		lampara.Draw(lightingShader);
+
+		//lampara de calle glorieta
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, glm::vec3(130.5f, 0.0f, 11.5f));
+		model = glm::rotate(model, glm::radians(225.0f), glm::vec3(0.0f, 1.0f, 0.0));
+		model = glm::scale(model, glm::vec3(1.0f, 2.0f, 1.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		lampara.Draw(lightingShader);
+
+		//lampara de calle glorieta
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, glm::vec3(105.0f, 0.0f, 1.0f));
+		model = glm::rotate(model, glm::radians(270.0f), glm::vec3(0.0f, 1.0f, 0.0));
+		model = glm::scale(model, glm::vec3(1.0f, 2.0f, 1.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		lampara.Draw(lightingShader);
+
+		//lampara de calle glorieta
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, glm::vec3(80.0f, 0.0f, 7.5f));
+		model = glm::rotate(model, glm::radians(315.0f), glm::vec3(0.0f, 1.0f, 0.0));
+		model = glm::scale(model, glm::vec3(1.0f, 2.0f, 1.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		lampara.Draw(lightingShader);
+
+		//---------------------------------------------------------------------------------------------
+		//----------------------------------------AUTOS------------------------------------------------
+		//---------------------------------------------------------------------------------------------
+
+		//BMW
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, pos_bmw + glm::vec3(mov_bmw_x, 0, mov_bmw_z));
+		model = glm::rotate(model, glm::radians( bmw_rot ), glm::vec3(0.0f, 1.0f, 0.0));
+		model = glm::scale(model, glm::vec3(2.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		bmw.Draw(lightingShader);
+
+		//Tesla truck
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, pos_tesla + glm::vec3(mov_tesla_x, 0, mov_tesla_z));
+		model = glm::rotate(model, glm::radians( tesla_rot), glm::vec3(0.0f, 1.0f, 0.0));
+		model = glm::scale(model, glm::vec3(0.8f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		tesla.Draw(lightingShader);
+
+
+		//Carga de modelo del auto a animar
 		//Carroceria
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
@@ -581,7 +787,7 @@ int main()
 		model = glm::translate(model, PosIniAuto1 + glm::vec3(movKitX, 0, movKitZ));
 		model = glm::rotate(model, glm::radians(rotKit), glm::vec3(0.0f, 1.0f, 0.0));
 		model = glm::translate(model, glm::vec3(1.7f, 0.5f, 2.6f));;
-		model = glm::scale(model, glm::vec3(0.02f, 0.02f, 0.02f));
+		model = glm::scale(model, glm::vec3(0.02f));
 		//model = glm::rotate(model, glm::radians(rotKit_der), glm::vec3(0.0f, 0.0f, 1.0));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		LLanta.Draw(lightingShader);
@@ -622,16 +828,6 @@ int main()
 
 		glBindVertexArray(0);
 
-		//camino
-		view = camera.GetViewMatrix();
-		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(-17.0f, 0.0f, 37.5f));
-		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0));
-		model = glm::scale(model, glm::vec3(7.6f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		calle.Draw(lightingShader);
-
-		//Carga de modelos
 		//---------------------------------------------------------------------------------------------
 		//---------------------------------------CASA 1------------------------------------------------
 		//---------------------------------------------------------------------------------------------
@@ -949,7 +1145,7 @@ int main()
 		//Perrito
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, PosIniAuto1 + glm::vec3(30, 0, 10));
+		model = glm::translate(model, glm::vec3(30, 0, 25));
 		model = glm::rotate(model, glm::radians(rotKit1), glm::vec3(0.0f, 1.0f, 0.0));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		perrito.Draw(lightingShader);
@@ -1976,21 +2172,16 @@ void DoMovement()
 	if (keys[GLFW_KEY_W] || keys[GLFW_KEY_UP])
 	{
 		camera.ProcessKeyboard(FORWARD, deltaTime);
-
 	}
 
 	if (keys[GLFW_KEY_S] || keys[GLFW_KEY_DOWN])
 	{
 		camera.ProcessKeyboard(BACKWARD, deltaTime);
-
-
 	}
 
 	if (keys[GLFW_KEY_A] || keys[GLFW_KEY_LEFT])
 	{
 		camera.ProcessKeyboard(LEFT, deltaTime);
-
-
 	}
 
 	if (keys[GLFW_KEY_D] || keys[GLFW_KEY_RIGHT])
@@ -2007,8 +2198,33 @@ void DoMovement()
 
 void animacion()
 {
+	//animación del tesla
+	if (tesla_circuito) 
+	{
+		if (tesla_recorrido_1) 
+		{
+			tesla_rot = 90;
+			mov_tesla_x += 0.1f;
+			if (mov_tesla_x > 30) 
+			{
+				tesla_recorrido_1 = false;
+				tesla_recorrido_2 = true;
+			}
+				
+		}
+		if (tesla_recorrido_2)
+		{
+			tesla_rot = -90; 
+			mov_tesla_x -= 0.1f;
+			if (mov_tesla_x < 0)
+			{
+				tesla_recorrido_2 = false;
+				tesla_recorrido_1 = true;
+			}
 
-	//Movimiento del coche
+		}
+	}
+	//Movimiento del lambo
 	if (circuito)
 	{
 

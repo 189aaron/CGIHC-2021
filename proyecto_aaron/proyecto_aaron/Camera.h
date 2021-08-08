@@ -48,6 +48,8 @@ public:
 		this->yaw = yaw;
 		this->pitch = pitch;
 		this->updateCameraVectors();
+		printf("x= %f\n", right);
+		printf("z= %f\n", front);
 	}
 
 	// Returns the view matrix calculated using Eular Angles and the LookAt Matrix
@@ -74,6 +76,7 @@ public:
 		if (direction == LEFT)
 		{
 			this->position -= this->right * velocity;
+
 		}
 
 		if (direction == RIGHT)
@@ -159,5 +162,6 @@ private:
 		// Also re-calculate the Right and Up vector
 		this->right = glm::normalize(glm::cross(this->front, this->worldUp));  // Normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
 		this->up = glm::normalize(glm::cross(this->right, this->front));
+
 	}
 };
