@@ -2437,6 +2437,8 @@ void animacion()
 		{
 			rotKit = 90;
 			movKitX += 0.05f;
+			rotKit_der = 0;
+			rotKit_izq = 0;
 			if (movKitX > 54)
 			{
 				movKitX = 0.0f;
