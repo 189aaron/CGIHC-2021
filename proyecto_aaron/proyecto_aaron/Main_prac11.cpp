@@ -1981,7 +1981,7 @@ void animacion()
 	if (ventanales_animacion) {
 
 		if (ventanales_animacion_abrir) {
-			mov_vent += 0.1f;
+			mov_vent += 0.01f;
 			if (mov_vent > 1.5) {
 				ventanales_animacion_abrir = false;
 				ventanales_animacion_cerrar = true;
@@ -1989,7 +1989,7 @@ void animacion()
 		}
 
 		if (ventanales_animacion_cerrar) {
-			mov_vent -= 0.1f;
+			mov_vent -= 0.01f;
 			if (mov_vent < 0) {
 				ventanales_animacion_cerrar = false;
 				ventanales_animacion_abrir = true;
