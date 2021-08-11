@@ -36,7 +36,7 @@ const GLuint WIDTH = 1024, HEIGHT = 680;
 int SCREEN_WIDTH, SCREEN_HEIGHT;
 
 // Camera
-Camera  camera(glm::vec3(0.0f, 3.0f, 50.0f));
+Camera  camera(glm::vec3(35.0f, 3.0f, 50.0f));
 //Camera  camera(glm::vec3(52.0f, 1.5f, 61.0f));
 GLfloat lastX = WIDTH / 3.0;
 GLfloat lastY = HEIGHT / 3.0;
@@ -51,8 +51,6 @@ glm::vec3 lightPos(0.0f, 0.0f, 0.0f);
 glm::vec3 PosIni(-25.0f, 0.0f, -15.0f);
 glm::vec3 PosIniAuto(-15.0f, 0.0f, -15.0f);
 
-
-glm::vec3 PosIniAuto1(0.0f, 0.0f, 15.0f);//para mover al auto
 
 
 bool active;
@@ -102,9 +100,10 @@ glm::vec3 casa_2(35.0f, 0.0f, 0.0f);
 glm::vec3 casa_3(9.0f, 0.0f, 55.0f);
 glm::vec3 casa_4(44.0f, 0.0f, 55.0f);
 
-glm::vec3 pos_bmw(34.5, 0, 22);
+glm::vec3 pos_bmw(34.5, 0, 22); 
+glm::vec3 pos_lambo_esta(29, 0, 60);
 glm::vec3 pos_tesla(0, 0, 40);
-glm::vec3 pos_lambo(0, 0, 0);
+glm::vec3 pos_lambo(0, 0, 15);
 glm::vec3 pos_perro_casa(30, 0, 25);
 glm::vec3 pos_perro_fuente(105, 0.2, 37.5);
 
@@ -128,6 +127,12 @@ float mov_tesla_z = 0.0;
 float mov_bmw_x = 0.0;
 float mov_bmw_z = 0.0;
 
+float mov_aux_x_izq = 0.0;
+float mov_aux_z_izq = 0.0;
+float mov_aux_x_der = 0.0;
+float mov_aux_z_der = 0.0;
+
+
 float mov_perro_fuente_x = 0.0;
 float mov_perro_fuente_y = 0.0;
 float mov_perro_fuente_z = 0.0;
@@ -136,10 +141,16 @@ float mov_perro_casa_x = 0.0;
 float mov_perro_casa_y = 0.0;
 float mov_perro_casa_z = 0.0;
 
+
+
 float rotKit1 = 0.0;//orientación de la casa 1
 float rotKit2 = 0.0;//orientación de la casa 2
 float rotKit3 = 180.0;//orientación de la casa 3
 float rotKit4 = 180.0;//orientación de la casa 4
+
+bool ventanales_animacion = true;
+bool ventanales_animacion_abrir = true;
+bool ventanales_animacion_cerrar= false;
 
 bool circuito = true;
 bool recorrido1 = true;
@@ -182,7 +193,6 @@ void saveFrame(void)
 	KeyFrame[FrameIndex].posZ = posZ;
 	
 	KeyFrame[FrameIndex].rotRodIzq = rotRodIzq;
-	
 
 	FrameIndex++;
 }
@@ -481,12 +491,19 @@ int main()
 
 	// Load textures
 	vector<const GLchar*> faces;
-	faces.push_back("SkyBox/right.tga");
+	/*faces.push_back("SkyBox/right.tga");
 	faces.push_back("SkyBox/left.tga");
 	faces.push_back("SkyBox/top.tga");
 	faces.push_back("SkyBox/bottom.tga");
 	faces.push_back("SkyBox/back.tga");
-	faces.push_back("SkyBox/front.tga");
+	faces.push_back("SkyBox/front.tga");*/
+
+	faces.push_back("SkyBox/violentdays/violentdays_rt.tga");
+	faces.push_back("SkyBox/violentdays/violentdays_lf.tga");
+	faces.push_back("SkyBox/violentdays/violentdays_up.tga");
+	faces.push_back("SkyBox/violentdays/violentdays_dn.tga");
+	faces.push_back("SkyBox/violentdays/violentdays_bk.tga");
+	faces.push_back("SkyBox/violentdays/violentdays_ft.tga");
 	
 	GLuint cubemapTexture = TextureLoading::LoadCubemap(faces);
 
@@ -628,8 +645,16 @@ int main()
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
 		model = glm::translate(model, pos_perro_fuente + glm::vec3(0, mov_perro_fuente_y, 0));
-		//model = glm::rotate(model, glm::radians(perro_rot_fuente), glm::vec3(0.0f, 1.0f, 0.0));
+		model = glm::rotate(model, glm::radians(0.0f + perro_rot_fuente), glm::vec3(0.0f, 1.0f, 0.0));
 		//model = glm::scale(model, glm::vec3(1.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		perrito.Draw(lightingShader);
+
+		//Perrito en la calle 
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, glm::vec3(40, 0, 31));
+		model = glm::rotate(model, glm::radians(rotKit1 - 40.0f), glm::vec3(0.0f, 1.0f, 0.0));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		perrito.Draw(lightingShader);
 
@@ -775,8 +800,56 @@ int main()
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		tesla.Draw(lightingShader);
 
+		//Carga de modelo del auto sin animar
+		//Carroceria
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, pos_lambo_esta);
+		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0));
+		model = glm::scale(model, glm::vec3(0.02f, 0.02f, 0.02f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		Carroseria.Draw(lightingShader);
 
-		//Carga de modelo del auto a animar
+		//Llanta Delantera Der
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, pos_lambo_esta);
+		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0));
+		model = glm::translate(model, glm::vec3(1.7f, 0.5f, 2.6f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		LLanta.Draw(lightingShader);
+
+		//Llanta Delantera Izq
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, pos_lambo_esta);
+		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0, 1.0, 0.0));
+		model = glm::translate(model, glm::vec3(-1.7f, 0.5f, 2.6f));
+		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0, 1.0, 0.0));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		LLanta.Draw(lightingShader);
+
+		//Llanta Trasera Der
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, pos_lambo_esta);
+		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0));
+		model = glm::translate(model, glm::vec3(1.7f, 0.5f, -2.9f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		LLanta.Draw(lightingShader);
+
+
+		//Llanta Trasera Izq
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, pos_lambo_esta);
+		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0));
+		model = glm::translate(model, glm::vec3(-1.7f, 0.5f, -2.9f));
+		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		LLanta.Draw(lightingShader);
+
+		//Carga de modelo del auto a ANIMAR //Carga de modelo del auto a ANIMAR
 		//Carroceria
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
@@ -789,11 +862,19 @@ int main()
 		//Llanta Delantera Der
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, pos_lambo + glm::vec3(movKitX, 0, movKitZ));
+		model = glm::translate(model, pos_lambo + glm::vec3(movKitX , 0, movKitZ ));
 		model = glm::rotate(model, glm::radians(rotKit + rotKit_der), glm::vec3(0.0f, 1.0f, 0.0));
-		model = glm::translate(model, glm::vec3(1.7f, 0.5f, 2.6f));;
-		model = glm::scale(model, glm::vec3(0.02f));
-		//model = glm::rotate(model, glm::radians(rotKit_der), glm::vec3(0.0f, 0.0f, 1.0));
+		model = glm::translate(model, glm::vec3(1.7f , 0.5f, 2.6f ));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		LLanta.Draw(lightingShader);
+
+		//Llanta Delantera Izq
+		view = camera.GetViewMatrix();
+		model = glm::mat4(1);
+		model = glm::translate(model, pos_lambo + glm::vec3(movKitX , 0, movKitZ ));
+		model = glm::rotate(model, glm::radians(rotKit + rotKit_izq), glm::vec3(0.0, 1.0, 0.0));
+		model = glm::translate(model, glm::vec3(-1.7f , 0.5f, 2.6f));
+		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0, 1.0, 0.0));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		LLanta.Draw(lightingShader);
 
@@ -803,31 +884,17 @@ int main()
 		model = glm::translate(model, pos_lambo + glm::vec3(movKitX, 0, movKitZ));
 		model = glm::rotate(model, glm::radians(rotKit), glm::vec3(0.0f, 1.0f, 0.0));
 		model = glm::translate(model, glm::vec3(1.7f, 0.5f, -2.9f));
-		model = glm::scale(model, glm::vec3(0.02f, 0.02f, 0.02f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		LLanta.Draw(lightingShader);
-
-
-		//Llanta Delantera Izq
-		view = camera.GetViewMatrix();
-		model = glm::mat4(1);
-		model = glm::translate(model, pos_lambo + glm::vec3(movKitX, 0, movKitZ));
-		model = glm::rotate(model, glm::radians(rotKit + rotKit_izq), glm::vec3(0.0, 1.0, 0.0));
-		model = glm::translate(model, glm::vec3(-1.7f, 0.5f, 2.6f));
-		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0, 1.0, 0.0));
-		model = glm::scale(model, glm::vec3(0.02f, 0.02f, 0.02f));
-		//model = glm::rotate(model, glm::radians(rotKit_izq), glm::vec3(0.0, 0.0, 1.0));//vista de frente
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		LLanta.Draw(lightingShader);
+	
 
 		//Llanta Trasera Izq
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
 		model = glm::translate(model, pos_lambo + glm::vec3(movKitX, 0, movKitZ));
 		model = glm::rotate(model, glm::radians(rotKit), glm::vec3(0.0f, 1.0f, 0.0));
-		model = glm::translate(model, glm::vec3(-1.7f, 0.8f, -2.9f));
-		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0));
-		model = glm::scale(model, glm::vec3(0.02f, 0.02f, 0.02f));
+		model = glm::translate(model, glm::vec3(-1.7f, 0.5f, -2.9f));
+		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		LLanta.Draw(lightingShader);
 
@@ -1466,7 +1533,7 @@ int main()
 		//casa cristales
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, casa_3 + glm::vec3(10 + mov_vent, 0, 10));
+		model = glm::translate(model, casa_3 + glm::vec3(10, 0, 10));
 		model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		casa_aa_c.Draw(lightingShader);
@@ -1535,228 +1602,7 @@ int main()
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		puerta4.Draw(lightingShader);
 
-		////fogata
-		//view = camera.GetViewMatrix();
-		//model = glm::mat4(1);
-		//model = glm::translate(model, casa_3 + glm::vec3(24, -0.4, 22));
-		//model = glm::scale(model, glm::vec3(0.3f, 0.3f, 0.3f));
-		//model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//fogata.Draw(lightingShader);
-
-		////cama cuarto principal
-		//view = camera.GetViewMatrix();
-		//model = glm::mat4(1);
-		//model = glm::translate(model, casa_3 + glm::vec3(10.2, 2.7, 14));
-		//model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
-		//model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0));
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//cama.Draw(lightingShader);
-
-		////cama cuarto del fondo
-		//view = camera.GetViewMatrix();
-		//model = glm::mat4(1);
-		//model = glm::translate(model, casa_3 + glm::vec3(21.1, 2.7, 11));
-		//model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
-		//model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0));
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//cama.Draw(lightingShader);
-
-		////camastro 1
-		//view = camera.GetViewMatrix();
-		//model = glm::mat4(1);
-		//model = glm::translate(model, casa_3 + glm::vec3(6, 0, 24));
-		//model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
-		//model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0));
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//camastro.Draw(lightingShader);
-
-		////camastro 2
-		//view = camera.GetViewMatrix();
-		//model = glm::mat4(1);
-		//model = glm::translate(model, casa_3 + glm::vec3(6, 0, 22.7));
-		//model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
-		//model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0));
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//camastro.Draw(lightingShader);
-
-		////camastro 3 
-		//view = camera.GetViewMatrix();
-		//model = glm::mat4(1);
-		//model = glm::translate(model, casa_3 + glm::vec3(6, 0, 21.4));
-		//model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
-		//model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0));
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//camastro.Draw(lightingShader);
-
-		////camastro 4
-		//view = camera.GetViewMatrix();
-		//model = glm::mat4(1);
-		//model = glm::translate(model, casa_3 + glm::vec3(6, 0, 20.1));
-		//model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
-		//model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0));
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//camastro.Draw(lightingShader);
-
-		////mesa exterior
-		//view = camera.GetViewMatrix();
-		//model = glm::mat4(1);
-		//model = glm::translate(model, casa_3 + glm::vec3(16.5, 0, 23));
-		//model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//mesa.Draw(lightingShader);
-
-		////mesa estancia
-		//view = camera.GetViewMatrix();
-		//model = glm::mat4(1);
-		//model = glm::translate(model, casa_3 + glm::vec3(21, -0.4, 23));
-		//model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
-		//model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0));
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//mesa_estancia.Draw(lightingShader);
-
-		////silla exterior 1
-		//view = camera.GetViewMatrix();
-		//model = glm::mat4(1);
-		//model = glm::translate(model, casa_3 + glm::vec3(16, 0, 23));
-		//model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//silla.Draw(lightingShader);
-
-		////silla exterior 2
-		//view = camera.GetViewMatrix();
-		//model = glm::mat4(1);
-		//model = glm::translate(model, casa_3 + glm::vec3(16, 0, 23.8));
-		//model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//silla.Draw(lightingShader);
-
-		////silla exterior 3
-		//view = camera.GetViewMatrix();
-		//model = glm::mat4(1);
-		//model = glm::translate(model, casa_3 + glm::vec3(16, 0, 24.6));
-		//model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//silla.Draw(lightingShader);
-
-		////silla exterior 4
-		//view = camera.GetViewMatrix();
-		//model = glm::mat4(1);
-		//model = glm::translate(model, casa_3 + glm::vec3(16, 0, 20.9));
-		//model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
-		//model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0));
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//silla.Draw(lightingShader);
-
-		////silla exterior 5
-		//view = camera.GetViewMatrix();
-		//model = glm::mat4(1);
-		//model = glm::translate(model, casa_3 + glm::vec3(16, 0, 21.5));
-		//model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
-		//model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0));
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//silla.Draw(lightingShader);
-
-		////silla exterior 6
-		//view = camera.GetViewMatrix();
-		//model = glm::mat4(1);
-		//model = glm::translate(model, casa_3 + glm::vec3(16, 0, 23.3));
-		//model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
-		//model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0));
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//silla.Draw(lightingShader);
-
-		////mesa interior
-		//view = camera.GetViewMatrix();
-		//model = glm::mat4(1);
-		//model = glm::translate(model, casa_3 + glm::vec3(13.5, 0, 15));
-		//model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
-		//model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0));
-		//model = glm::scale(model, glm::vec3(0.7f, 0.7f, 0.7f));
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//mesa.Draw(lightingShader);
-
-		////silla interior 1
-		//view = camera.GetViewMatrix();
-		//model = glm::mat4(1);
-		//model = glm::translate(model, casa_3 + glm::vec3(13.5, 0, 15.2));
-		//model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
-		//model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0));
-		//model = glm::scale(model, glm::vec3(0.7f, 0.7f, 0.7f));
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//silla.Draw(lightingShader);
-
-		////silla interior 2
-		//view = camera.GetViewMatrix();
-		//model = glm::mat4(1);
-		//model = glm::translate(model, casa_3 + glm::vec3(14, 0, 15.2));
-		//model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
-		//model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0));
-		//model = glm::scale(model, glm::vec3(0.7f, 0.7f, 0.7f));
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//silla.Draw(lightingShader);
-
-		////silla interior 3
-		//view = camera.GetViewMatrix();
-		//model = glm::mat4(1);
-		//model = glm::translate(model, casa_3 + glm::vec3(14.5, 0, 15.2));
-		//model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
-		//model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0));
-		//model = glm::scale(model, glm::vec3(0.7f, 0.7f, 0.7f));
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//silla.Draw(lightingShader);
-
-
-		////silla interior 4
-		//view = camera.GetViewMatrix();
-		//model = glm::mat4(1);
-		//model = glm::translate(model, casa_3 + glm::vec3(12, 0, 15.5));
-		//model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
-		//model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0));
-		//model = glm::scale(model, glm::vec3(0.7f, 0.7f, 0.7f));
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//silla.Draw(lightingShader);
-
-		////silla interior 5
-		//view = camera.GetViewMatrix();
-		//model = glm::mat4(1);
-		//model = glm::translate(model, casa_3 + glm::vec3(12.5, 0, 15.5));
-		//model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
-		//model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0));
-		//model = glm::scale(model, glm::vec3(0.7f, 0.7f, 0.7f));
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//silla.Draw(lightingShader);
-
-		////silla interior 6
-		//view = camera.GetViewMatrix();
-		//model = glm::mat4(1);
-		//model = glm::translate(model, casa_3 + glm::vec3(13, 0, 15.5));
-		//model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
-		//model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0));
-		//model = glm::scale(model, glm::vec3(0.7f, 0.7f, 0.7f));
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//silla.Draw(lightingShader);
-
-
-		////alacena
-		//view = camera.GetViewMatrix();
-		//model = glm::mat4(1);
-		//model = glm::translate(model, casa_3 + glm::vec3(20.8, 0, 10.5));
-		//model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
-		//model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0));
-		//model = glm::scale(model, glm::vec3(1.0f, 0.9f, 1.0f));
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//alacena.Draw(lightingShader);
-
-		////alacena
-		//view = camera.GetViewMatrix();
-		//model = glm::mat4(1);
-		//model = glm::translate(model, casa_3 + glm::vec3(30, 0, 10.5));
-		//model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
-		//model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0));
-		//model = glm::scale(model, glm::vec3(1.0f, 0.9f, 1.0f));
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//alacena.Draw(lightingShader);
+		
 
 //---------------------------------------------------------------------------------------------
 		//---------------------------------------CASA 3------------------------------------------------
@@ -1780,7 +1626,7 @@ int main()
 		//casa cristales
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, casa_3 + glm::vec3(10 + mov_vent, 0, 10));
+		model = glm::translate(model, casa_3 + glm::vec3(10 , 0, 10));
 		model = glm::rotate(model, glm::radians(rotKit3), glm::vec3(0.0f, 1.0f, 0.0));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		casa_aa_c.Draw(lightingShader);
@@ -1871,7 +1717,7 @@ int main()
 		//casa cristales
 		view = camera.GetViewMatrix();
 		model = glm::mat4(1);
-		model = glm::translate(model, casa_4 + glm::vec3(10 + mov_vent, 0, 10));
+		model = glm::translate(model, casa_4 + glm::vec3(10, 0, 10));
 		model = glm::rotate(model, glm::radians(rotKit4), glm::vec3(0.0f, 1.0f, 0.0));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		casa_aa_c.Draw(lightingShader);
@@ -2085,80 +1931,18 @@ void DoMovement()
 	if (keys[GLFW_KEY_I])
 	{
 		circuito = true;
+		tesla_circuito = true;
+		ventanales_animacion = true;
 	}
 
 	if (keys[GLFW_KEY_O])
 	{
 		circuito = false;
-	}
-
-	//animacion de las puertas
-	if (keys[GLFW_KEY_1])
-	{
-		if (abrir1 >= 0) {
-			abrir1 -= 0.5f;
-		}
-	}
-	if (keys[GLFW_KEY_2])
-	{
-		if (abrir1 <= 90) {
-			abrir1 += 0.5f;
-		}
-	}
-	//animacion de las puertas
-	if (keys[GLFW_KEY_3])
-	{
-		if (abrir2 >= 0) {
-			abrir2 -= 0.5f;
-		}
-	}
-	if (keys[GLFW_KEY_4])
-	{
-		if (abrir2 <= 90) {
-			abrir2 += 0.5f;
-		}
-	}//animacion de las puertas
-	if (keys[GLFW_KEY_5])
-	{
-		if (abrir3 >= 0) {
-			abrir3 -= 0.5f;
-		}
-	}
-	if (keys[GLFW_KEY_6])
-	{
-		if (abrir3 <= 90) {
-			abrir3 += 0.5f;
-		}
-	}//animacion de las puertas
-	if (keys[GLFW_KEY_7])
-	{
-		if (abrir4 >= 0) {
-			abrir4 -= 0.5f;
-		}
-	}
-	if (keys[GLFW_KEY_8])
-	{
-		if (abrir4 <= 90) {
-			abrir4 += 0.5f;
-		}
+		tesla_circuito = false;
+		ventanales_animacion = false;
 	}
 
 
-
-	if (keys[GLFW_KEY_Q])
-	{
-		if (mov_vent >= 0.1) {
-			mov_vent -= 0.1f;
-			//printf("mov_vent %f\n", mov_vent);
-		}
-	}
-	if (keys[GLFW_KEY_E])
-	{
-		if (mov_vent <= 1.5) {
-			mov_vent += 0.1f;
-			//printf("mov_vent %f\n", mov_vent);
-		}
-	}
 
 
 
@@ -2192,6 +1976,29 @@ void DoMovement()
 
 void animacion()
 {
+
+	//animación de ventanas que abren y cierran
+	if (ventanales_animacion) {
+
+		if (ventanales_animacion_abrir) {
+			mov_vent += 0.1f;
+			if (mov_vent > 1.5) {
+				ventanales_animacion_abrir = false;
+				ventanales_animacion_cerrar = true;
+			}
+		}
+
+		if (ventanales_animacion_cerrar) {
+			mov_vent -= 0.1f;
+			if (mov_vent < 0) {
+				ventanales_animacion_cerrar = false;
+				ventanales_animacion_abrir = true;
+				
+			}
+		}
+		
+	}
+
 	//animación del tesla
 	if (tesla_circuito) 
 	{
@@ -2323,6 +2130,7 @@ void animacion()
 	{
 		if (perrito_sube)
 		{
+			perro_rot_fuente += 0.5;
 			mov_perro_fuente_y += 0.05;
 			if (mov_perro_fuente_y > 0.8)
 			{
@@ -2334,6 +2142,7 @@ void animacion()
 
 		if (perrito_baja) 
 		{
+			perro_rot_fuente += 0.5;
 			mov_perro_fuente_y -= 0.08;
 			if (mov_perro_fuente_y < 0.2)
 			{
@@ -2349,24 +2158,26 @@ void animacion()
 		//salida del estacionamiento
 		if (recorrido1)
 		{
-			rotKit = 0;
-			movKitZ += 0.3f;
-			rotKit_der = 0;
-			rotKit_izq = 0;
-			if (movKitZ > 23)
+			rotKit = rotKit_der = rotKit_izq = 0;
+			movKitZ += 0.1f;
+			if (movKitZ > 22.0f)
 			{
-				recorrido1 = false;
-				recorrido2 = true;
+				rotKit_der = rotKit_izq = 45;//rotación de las llantas
+				if (movKitZ > 23.0f)
+				{
+					recorrido1 = false;
+					recorrido2 = true;
+				}
 			}
 		}
+
 		//primer giro dentro de la calle
 		if (recorrido2)
 		{
-			rotKit = 45;
-			movKitX += 0.1f;
-			movKitZ += 0.1f;
-			rotKit_der = 45;
-			rotKit_izq = 45;
+			rotKit = 45; //rotación del auto
+			movKitX += 0.08f;
+			movKitZ += 0.08f;
+			rotKit_der = rotKit_izq = 0;
 			if (movKitZ > 25)
 			{
 				recorrido2 = false;
@@ -2378,16 +2189,20 @@ void animacion()
 		//avanzando al final de la calle
 		if (recorrido3)
 		{
-			rotKit = 90;
-			movKitX += 0.2f;
-			rotKit_der = 0;
-			rotKit_izq = 0;
-			if (movKitX > 50)
+			rotKit = 90;//rotación del auto
+			movKitX += 0.1f;
+			rotKit_der = rotKit_izq = 0;//rotación de las llantas
+			if (movKitX > 48.4)
 			{
-				recorrido3 = false;
-				recorrido4 = true;
-				rotKit_der = 45;
-				rotKit_izq = 45;
+				rotKit_der = rotKit_izq = 45;
+			
+				if (movKitX > 49)
+				{
+					recorrido3 = false;
+					recorrido4 = true;
+					rotKit_der = rotKit_izq = 45;
+
+				}
 
 			}
 		}
@@ -2395,28 +2210,30 @@ void animacion()
 		//primer movimiento para estacionarse
 		if (recorrido4)
 		{
-			rotKit = 112.5;
+			rotKit = 112.5;//rotación del auto
 			movKitX -= 0.1f;
 			movKitZ += 0.05f;
-			rotKit_der = 40;
-			rotKit_izq = 40;
+			rotKit_der = rotKit_izq = -45;//rotación de las llantas
 			if (movKitZ > 26)
 			{
 				recorrido4 = false;
 				recorrido5 = true;
 			}
 		}
+
 		if (recorrido5)
 		{
 			rotKit = 135;
 			movKitX -= 0.1f;
 			movKitZ += 0.1f;
-			rotKit_der = 0;
-			rotKit_izq = 0;
-			if (movKitZ > 27)
+			rotKit_der = rotKit_izq = 0;
+			if (movKitZ > 26.6)
 			{
-				recorrido5 = false;
-				recorrido6 = true;
+				if (movKitZ > 27)
+				{
+					recorrido5 = false;
+					recorrido6 = true;
+				}
 			}
 		}
 		if (recorrido6)
@@ -2424,8 +2241,7 @@ void animacion()
 			rotKit = 112.5;
 			movKitX -= 0.1f;
 			movKitZ += 0.05f;
-			rotKit_der = -40;
-			rotKit_izq = -40;
+			rotKit_der = rotKit_izq = -45;
 			if (movKitZ > 28)
 			{
 				recorrido6 = false;
@@ -2437,9 +2253,8 @@ void animacion()
 		{
 			rotKit = 90;
 			movKitX += 0.05f;
-			rotKit_der = 0;
-			rotKit_izq = 0;
-			if (movKitX > 54)
+			rotKit_der = rotKit_izq = 0;
+			if (movKitX > 48)
 			{
 				movKitX = 0.0f;
 				movKitZ = 0.0f;
